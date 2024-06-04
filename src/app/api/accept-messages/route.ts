@@ -5,7 +5,6 @@ import UserModel from '@/model/User';
 import { User } from 'next-auth';
 
 export async function POST(request: Request) {
-  // Connect to the database
   await dbConnect();
 
   const session = await getServerSession(authOptions);
@@ -21,7 +20,6 @@ export async function POST(request: Request) {
   const { acceptMessages } = await request.json();
 
   try {
-    // Update the user's message acceptance status
     const updatedUser = await UserModel.findByIdAndUpdate(
       userId,
       { isAcceptingMessages: acceptMessages },
@@ -29,7 +27,6 @@ export async function POST(request: Request) {
     );
 
     if (!updatedUser) {
-      // User not found
       return Response.json(
         {
           success: false,
@@ -38,8 +35,6 @@ export async function POST(request: Request) {
         { status: 404 }
       );
     }
-
-    // Successfully updated message acceptance status
     return Response.json(
       {
         success: true,
@@ -56,17 +51,10 @@ export async function POST(request: Request) {
     );
   }
 }
-
-
 export async function GET(request: Request) {
-  // Connect to the database
   await dbConnect();
-
-  // Get the user session
   const session = await getServerSession(authOptions);
   const user = session?.user;
-
-  // Check if the user is authenticated
   if (!session || !user) {
     return Response.json(
       { success: false, message: 'Not authenticated' },
@@ -75,18 +63,13 @@ export async function GET(request: Request) {
   }
 
   try {
-    // Retrieve the user from the database using the ID
     const foundUser = await UserModel.findById(user._id);
-
     if (!foundUser) {
-      // User not found
       return Response.json(
         { success: false, message: 'User not found' },
         { status: 404 }
       );
     }
-
-    // Return the user's message acceptance status
     return Response.json(
       {
         success: true,
